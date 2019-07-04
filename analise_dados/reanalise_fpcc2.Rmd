@@ -1,0 +1,69 @@
+---
+title: "Reanalise FPCC2"
+author: "Lorena Pereira"
+date: "3 de julho de 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(viridis)
+library(broom)
+library(skimr)
+
+```
+
+# Reanalise a partir da Replicação de Experimento
+Reanalise feita a partir de novos dados gerados com base no artigo: Understanding the Factors that Impact the Popularity of GitHub Repositories - DOI: 10.1109/ICSME.2016.31
+
+```{r}
+
+dados = read_csv("../dados/repositorios.csv")
+
+glimpse(dados)
+```
+
+Retirando elementos duplicados
+```{r}
+
+duplicados = duplicated(dados, fromLast = TRUE)
+
+which(duplicados)
+
+dados = dados[!duplicados,]
+
+glimpse(dados)
+```
+
+
+## Questão 1
+Como a popularidade varia de acordo com a linguagem de programação, o domínio do aplicativo e o proprietário do repositório? O objetivo é fornecer uma visão inicial sobre a popularidade dos sistemas estudados, comparando o número de estrelas de acordo com a linguagem de programação, o domínio do aplicativo e o proprietário do repositório (usuário ou organização). 
+```{r}
+
+
+```
+
+
+## Questão 2
+A popularidade se correlaciona com outras características de um repositório, como idade, número de contribuições, número de contribuintes e número de forks? Essa investigação é importante para verificar se há fatores que podem ser trabalhados para aumentar a popularidade de um projeto. 
+
+```{r}
+
+```
+
+## Questão 3
+Com que antecedência os repositórios se popularizam? Com essa questão de pesquisa, pretendemos verificar se os ganhos de popularidade estão concentrados em fases específicas do tempo de vida de um repositório, especificamente nas primeiras versões. 
+
+```{r}
+
+```
+
+## Questão 4
+Qual é o impacto dos novos recursos na popularidade? Esta investigação pode mostrar se ganhos relevantes em popularidade acontecem devido a novos recursos (implementados em novos lançamentos).
+
+```{r}
+
+```
+
