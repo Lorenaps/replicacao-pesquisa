@@ -37,9 +37,38 @@ dados = dados[!duplicados,]
 glimpse(dados)
 ```
 
+Tabela com a distribuição do numero de estrelas
+
+- analise 1
+
+- Distribuição da idade do repositorio (em semanas) - box plot
+- Commits
+- Contribuidores
+- Forks
+
+- analise 2
+
+- Distribuição das linguagens
+
+-analise 3
+- porcentagem dos 'donos'
+
+- analise 4 
+- distribuição Dominio da aplicação
+
+
 
 ## Questão 1
 Como a popularidade varia de acordo com a linguagem de programação, o domínio do aplicativo e o proprietário do repositório? O objetivo é fornecer uma visão inicial sobre a popularidade dos sistemas estudados, comparando o número de estrelas de acordo com a linguagem de programação, o domínio do aplicativo e o proprietário do repositório (usuário ou organização). 
+
+Distribuição de estrelas por linguagem de programação - mediana
+Aplicando Kruskal-Wallis = p value (0.001)
+
+O mesmo para o dominio da aplicação
+e para o owner - Mann-Whitney test
+
+Um ponto a pensar é que algumas linguagens como CSS podem ter um tamanho bem maior considerando o projeto
+
 ```{r}
 
 
@@ -49,12 +78,22 @@ Como a popularidade varia de acordo com a linguagem de programação, o domínio
 ## Questão 2
 A popularidade se correlaciona com outras características de um repositório, como idade, número de contribuições, número de contribuintes e número de forks? Essa investigação é importante para verificar se há fatores que podem ser trabalhados para aumentar a popularidade de um projeto. 
 
+stars x age - Spearman's Rank correlation (rho = 0,0757 p < 0.001)
+stars x forks - Spearman's Rank correlation (rho = 0,549 p < 0.001)
+stars x commits - Spearman's Rank correlation (rho = 0,249 p < 0.001)
+stars x contributors - Spearman's Rank correlation (rho = 0,341 p < 0.001)
+
+
+scatterplots
+
+Spearman's Rank correlation (rho = 0,0757 p < 0.001)
 ```{r}
 
 ```
 
 ## Questão 3
 Com que antecedência os repositórios se popularizam? Com essa questão de pesquisa, pretendemos verificar se os ganhos de popularidade estão concentrados em fases específicas do tempo de vida de um repositório, especificamente nas primeiras versões. 
+
 
 ```{r}
 
