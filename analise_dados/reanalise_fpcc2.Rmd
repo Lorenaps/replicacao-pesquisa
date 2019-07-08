@@ -14,6 +14,7 @@ library(broom)
 library(skimr)
 
 ```
+
 # Replicação de um experimento
 todo: Adicionar figura
 
@@ -52,6 +53,8 @@ Primeiro vamos a uma análise descritiva dos dados extraídos. Para a pergunta a
 
 ## Import dos dados e análise descritiva
 ```{r}
+options(scipen=999)
+
 dados_full = read_csv("../dados/repositorios_update.csv")
 
 glimpse(dados_full)
@@ -102,29 +105,46 @@ Descritivo dos dados:
 skim(dados)
 ```
 
-Histogramas 
+Boxplots
+
 ```{r}
-dados %>%
+
+p1 <- dados %>%
   ggplot(mapping = aes(y = age_weeks)) + 
   geom_boxplot() + 
-  ggtitle("Amplitude da idade do repositório") + 
-  ylab("Idade em semanas")
+  ylab("Idade em semanas") + 
+  scale_x_continuous(limits = c(-1.5, 1.5)) + 
+  theme_minimal()
 
-dados %>%
+p2 <- dados %>%
   ggplot(mapping = aes(y = commits)) + 
   geom_boxplot() + 
-  ylab("Commits")
+  ylab("Commits") +
+  scale_y_log10() + 
+  scale_x_continuous(limits = c(-1.5, 1.5)) + 
+  theme_minimal()
 
-dados %>%
+p3 <- dados %>%
   ggplot(mapping = aes(y = contributors)) + 
   geom_boxplot() +
-  ylab("Contribuidores")
+  ylab("Contribuidores") +
+  scale_y_log10() + 
+  scale_x_continuous(limits = c(-1.5, 1.5)) + 
+  theme_minimal()
 
-dados %>%
+p4 <- dados %>%
   ggplot(mapping = aes(y = forks)) + 
   geom_boxplot() +
-  ylab("Forks")
+  ylab("Forks") +
+  scale_y_log10() + 
+  scale_x_continuous(limits = c(-1.5, 1.5)) + 
+  theme_minimal()
 
+
+library(gridExtra)
+g = grid.arrange(p1, p2, p3, p4, ncol=2)
+
+ggsave("figura1.pdf", g)
 ```
 
 Quartis das estrelas recebidas
@@ -132,6 +152,7 @@ Quartis das estrelas recebidas
 q = dados$stargazers_count
 
 quantile(q)
+
 ```
 
 Quartis dos Commits
@@ -201,33 +222,11 @@ dados %>%
 
   # colocar boxplot
 ```
-## Questão 1
-Como a popularidade varia de acordo com a linguagem de programação, o domínio do aplicativo e o proprietário do repositório? O objetivo é fornecer uma visão inicial sobre a popularidade dos sistemas estudados, comparando o número de estrelas de acordo com a linguagem de programação, o domínio do aplicativo e o proprietário do repositório (usuário ou organização). 
 
-Distribuição de estrelas por linguagem de programação - mediana
-Aplicando Kruskal-Wallis = p value (0.001)
+## Questão a ser respondida
+A popularidade se correlaciona com outras características de um repositório, como idade, número de contribuições, número de contribuintes e número de forks? 
+Essa investigação é importante para verificar se há fatores que podem ser trabalhados para aumentar a popularidade de um projeto. 
 
-O mesmo para o dominio da aplicação
-e para o owner - Mann-Whitney test
-
-Um ponto a pensar é que algumas linguagens como CSS podem ter um tamanho bem maior considerando o projeto
-
-```{r}
-
-
-```
-## Questão 2
-A popularidade se correlaciona com outras características de um repositório, como idade, número de contribuições, número de contribuintes e número de forks? Essa investigação é importante para verificar se há fatores que podem ser trabalhados para aumentar a popularidade de um projeto. 
-
-stars x age - Spearman's Rank correlation (rho = 0,0757 p < 0.001)
-stars x forks - Spearman's Rank correlation (rho = 0,549 p < 0.001)
-stars x commits - Spearman's Rank correlation (rho = 0,249 p < 0.001)
-stars x contributors - Spearman's Rank correlation (rho = 0,341 p < 0.001)
-
-
-scatterplots
-
-Spearman's Rank correlation (rho = 0,0757 p < 0.001)
 
 ```{r}
 dados %>%
@@ -266,9 +265,9 @@ dados %>%
 
 ### Medindo a correlação
 
-Estrelas X Idade
+Estrelas X Idade do repositório
 
-**original: stars x age - Spearman's Rank correlation (rho = 0,0757 p < 0.001)**
+**Resultados do artigo original: stars x age - Spearman's Rank correlation (rho = 0,0757 p < 0.001)**
 ```{r}
 dados %>% 
   summarise(pearson = cor(stargazers_count, age_weeks, method = "pearson"), 
@@ -276,9 +275,9 @@ dados %>%
             kendall = cor(stargazers_count, age_weeks, method = "kendall"), )
 ```
 
-Estrelas X Commits
+Estrelas X Commits do repositório
 
-**original: stars x commits - Spearman's Rank correlation (rho = 0,249 p < 0.001)**
+**Resultados do artigo original: stars x commits - Spearman's Rank correlation (rho = 0,249 p < 0.001)**
 ```{r}
 dados %>% 
   summarise(pearson = cor(stargazers_count, commits, method = "pearson"), 
