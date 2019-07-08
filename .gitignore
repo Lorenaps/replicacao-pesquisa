@@ -1,9 +1,10 @@
 # Arquivos do projeto
 *.idea
+analise_dados/.Rhistory
+.Rproj.user
 
 # Arquivos pycache
 *__pycache__
 
 # Checkpoints ipynb
-*.ipynb_checkpoints
-.Rproj.user
+extracao_dados/.ipynb_checkpoints/*
