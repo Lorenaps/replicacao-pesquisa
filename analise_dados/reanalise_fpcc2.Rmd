@@ -12,6 +12,8 @@ library(here)
 library(viridis)
 library(broom)
 library(skimr)
+library(gridExtra)
+
 
 ```
 
@@ -111,7 +113,8 @@ Boxplots
 
 p1 <- dados %>%
   ggplot(mapping = aes(y = age_weeks)) + 
-  geom_boxplot() + 
+  # stat_boxplot(geom ='errorbar', fill = "#93A8AC") + 
+  geom_boxplot() +
   ylab("Idade em semanas") + 
   scale_x_continuous(limits = c(-1.5, 1.5)) + 
   theme_minimal()
@@ -140,8 +143,6 @@ p4 <- dados %>%
   scale_x_continuous(limits = c(-1.5, 1.5)) + 
   theme_minimal()
 
-
-library(gridExtra)
 g = grid.arrange(p1, p2, p3, p4, ncol=2)
 
 ggsave("figura1.pdf", g)
@@ -198,14 +199,17 @@ dados %>%
 ```
 
 ```{r}
-dados %>% 
+g <- dados %>% 
   group_by(language) %>%
   summarise(n = n()) %>%
-  top_n(10) %>%
+  top_n(5) %>%
   ggplot(mapping = aes(x = reorder(language, -n), y = n)) +
-    geom_bar(position="dodge", stat="identity") +
+    geom_bar(position="dodge", stat="identity", fill = "#D8973C") +
     theme(axis.text.x = element_text(angle = 90)) +
-    labs(x="Linguagens", y="Quantidade de repositórios")
+    labs(x="Linguagens", y="Quantidade de Repositórios")
+
+ggsave("figura2.pdf", g)
+
 ```
 
 Linguagens com mais estrelas
@@ -229,37 +233,42 @@ Essa investigação é importante para verificar se há fatores que podem ser tr
 
 
 ```{r}
-dados %>%
+p1 <- dados %>%
   ggplot(mapping = aes(x = age_weeks, y = stargazers_count)) + 
-  geom_jitter() +
+  geom_jitter(alpha = .2, color = "#245D6A") +
   ylab("Estrelas recebidas") +
   xlab("Idade em semanas") +
   scale_y_log10() + 
   scale_x_log10()
 
-dados %>%
+p2 <- dados %>%
   ggplot(mapping = aes(x = commits, y = stargazers_count)) + 
-  geom_jitter() +
+  geom_jitter(alpha = .2, color = "#245D6A") +
   ylab("Estrelas recebidas") +
   xlab("Commits") +
   scale_y_log10() + 
   scale_x_log10()
 
-dados %>%
+p3 <- dados %>%
   ggplot(mapping = aes(x = contributors, y = stargazers_count)) + 
-  geom_jitter() +
+  geom_jitter(alpha = .2, color = "#245D6A") +
   ylab("Estrelas recebidas") +
   xlab("Contribuidores") +
   scale_y_log10() + 
   scale_x_log10()
 
-dados %>%
+p4 <- dados %>%
   ggplot(mapping = aes(x = forks, y = stargazers_count)) + 
-  geom_jitter() +
+  geom_jitter(alpha = .2, color = "#245D6A") +
   ylab("Estrelas recebidas") +
   xlab("Forks") +
   scale_y_log10() + 
   scale_x_log10()
+
+
+g = grid.arrange(p1, p2, p3, p4, ncol=2)
+
+ggsave("figura3.pdf", g)
 
 ```
 
