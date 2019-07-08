@@ -7,4 +7,4 @@ analise_dados/.Rhistory
 *__pycache__
 
 # Checkpoints ipynb
-extracao_dados/.ipynb_checkpoints/*
+./extracao_dados/.ipynb_checkpoints/*
