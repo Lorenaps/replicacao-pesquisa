@@ -6,3 +6,4 @@
 
 # Checkpoints ipynb
 *.ipynb_checkpoints
+.Rproj.user
