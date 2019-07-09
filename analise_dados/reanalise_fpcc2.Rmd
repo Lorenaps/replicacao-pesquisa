@@ -10,50 +10,38 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(here)
 library(viridis)
-library(broom)
 library(skimr)
 library(gridExtra)
-
+library(boot)
+library(broom)
 
 ```
 
 # Replicação de um experimento
 todo: Adicionar figura
 
-# Reanálise a partir da Replicação de um Experimento
+## Reanálise da Replicação de um Experimento
 Reanalise feita a partir de novos dados gerados com base no artigo: Understanding the Factors that Impact the Popularity of GitHub Repositories - DOI: 10.1109/ICSME.2016.31
 
-O script de extração dos dados pode ser encontrado nesse [notebook](https://github.com/Lorenaps/replicacao-pesquisa/blob/master/extracao_dados/search_github_api.ipynb)
+O script de extração dos dados pode ser encontrado nesse [notebook](https://github.com/Lorenaps/replicacao-pesquisa/blob/master/extracao_dados/search_github_api.ipynb), bem como a descrição dos dados.
 
 Foi feito na linguagem Python utilizando a própria api do github e a biblioteca PyGithub. 
-A extração foi realizada do dia 7 de julho de 2019.
+A extração final foi realizada do dia 7 de julho de 2019.
 
 O artigo original descreve um estudo sobre a popularidade de sistemas de software no GitHub realizando 3 partes. A primeira é coletar os dados do github e fazer uma análise quantitativa a fim de responder algumas perguntas. Depois documenta-se 4 padrões de popularidade a partir da análise anterior e por fim realiza-se uma entrevista com 44 desenvolvedores sobre alguns aspectos identificados durante a execução do trabalho.
 
 A atividade a ser replicada consiste na coleta dos dados através da api do github, análise quantitativa e conclusão considerando as questões de pesquisa do artigo original.
 
-As replicação a seguir pretende responder as questões 1 e 2 que são:
+As replicação a seguir pretende responder a questão 2 das questões listadas no artigo original.
 
-Questão 01: Como a popularidade varia de acordo com a linguagem de programação, o domínio do aplicativo e o proprietário do repositório? O objetivo é fornecer uma visão inicial sobre a popularidade dos sistemas estudados, comparando o número de estrelas de acordo com a linguagem de programação, o domínio do aplicativo e o proprietário do repositório (usuário ou organização). 
+**Questão 02:** A popularidade se correlaciona com outras características de um repositório, como idade, número de contribuições, número de contribuintes e número de forks? Essa investigação é importante para verificar se há fatores que podem ser trabalhados para aumentar a popularidade de um projeto. 
 
-Questão 02: A popularidade se correlaciona com outras características de um repositório, como idade, número de contribuições, número de contribuintes e número de forks? Essa investigação é importante para verificar se há fatores que podem ser trabalhados para aumentar a popularidade de um projeto. 
-
+### Sobre a extração
 A API do GitHub limita a utilização da ferramenta de pesquisa aos 1000 primeiros resultados, o que na prática se torna 1020 devido a páginação ser feita a cada 30 items, de forma que ou seriam 990 ou 1020, e no caso a página que contém o resultado 1000 permite a visualização até o resultado 1020.
 
-Primeiro vamos a uma análise descritiva dos dados extraídos. Para a pergunta a ser respondida vamos precisar obhervar os campos 
+Primeiro vamos a uma análise descritiva dos dados extraídos, e por fim a análise das informações necessárias para responder a questão 2.
 
-- full_name: Nome completo do repositório
-- description: Descrição curta do repositório
-- owner_type: Tipo de dono do repositório. Pode ser Usuário ou Organização.
-- created_at: Quando o repositório foi criado.
-- stargazers_count: Quantidade de stars.
-- language: Linguagem predominante no repositório.
-- forks: Quantidade de forks que o repositório sofreu.
-- timestamp_extract: Timestamp de quando os dados foram extraídos
-- commits: Quantidade de commits recebido.
-- contributors: Quantidade de contribuidores.
-
-## Import dos dados e análise descritiva
+## Import dos dados, exploração e análise descritiva
 ```{r}
 options(scipen=999)
 
@@ -122,7 +110,7 @@ p1 <- dados %>%
 p2 <- dados %>%
   ggplot(mapping = aes(y = commits)) + 
   geom_boxplot() + 
-  ylab("Commits") +
+  ylab("Contribuições") +
   scale_y_log10() + 
   scale_x_continuous(limits = c(-1.5, 1.5)) + 
   theme_minimal()
@@ -227,11 +215,18 @@ dados %>%
   # colocar boxplot
 ```
 
-## Questão a ser respondida
+Sumarizando correlações
+```{r}
+
+# ggggpairs(dados)
+
+```
+
+
+### Questão a ser respondida
 A popularidade se correlaciona com outras características de um repositório, como idade, número de contribuições, número de contribuintes e número de forks? 
-Essa investigação é importante para verificar se há fatores que podem ser trabalhados para aumentar a popularidade de um projeto. 
 
-
+#### Visualiação da correlação entre os campos
 ```{r}
 p1 <- dados %>%
   ggplot(mapping = aes(x = age_weeks, y = stargazers_count)) + 
@@ -245,7 +240,7 @@ p2 <- dados %>%
   ggplot(mapping = aes(x = commits, y = stargazers_count)) + 
   geom_jitter(alpha = .2, color = "#245D6A") +
   ylab("Estrelas recebidas") +
-  xlab("Commits") +
+  xlab("Contribuições") +
   scale_y_log10() + 
   scale_x_log10()
 
@@ -272,7 +267,7 @@ ggsave("figura3.pdf", g)
 
 ```
 
-### Medindo a correlação
+#### Medindo a correlação e o intevalo de confiança
 
 Estrelas X Idade do repositório
 
@@ -296,7 +291,7 @@ dados %>%
 
 Estrelas X Contributors
 
-**original: stars x contributors - Spearman's Rank correlation (rho = 0,341 p < 0.001)**
+**Resultados do artigo original: stars x contributors - Spearman's Rank correlation (rho = 0,341 p < 0.001)**
 
 ```{r}
 dados %>% 
@@ -307,7 +302,7 @@ dados %>%
 
 Estrelas X Forks
 
-**original: stars x forks - Spearman's Rank correlation (rho = 0,549 p < 0.001)**
+**Resultados do artigo original: stars x forks - Spearman's Rank correlation (rho = 0,549 p < 0.001)**
 
 ```{r}
 dados %>% 
@@ -316,6 +311,7 @@ dados %>%
             kendall = cor(stargazers_count, forks, method = "kendall"))
 ```
 
+**Outra forma de medir a correlação juntamente ao pvalor**
 ```{r}
 cor.test(~ stargazers_count + forks, data=dados, method = 'spearman', continuity = FALSE, conf.level = 0.95)
 ```
@@ -332,9 +328,87 @@ cor.test(~ stargazers_count + commits, data=dados, method = 'spearman', continui
 cor.test(~ stargazers_count + contributors, data=dados, method = 'spearman', continuity = FALSE, conf.level = 0.95)
 ```
 
-### Intervalo de confiança
+#### Intervalo de confiança
+
+
+Estrelas X Idade do repositório
 
 ```{r}
+
+function_correlacao = function(df, i){
+    theta_c_correlacao = df %>%
+        slice(i) %>%
+        summarise(correlacao = cor(stargazers_count, age_weeks, method = "spearm")) %>%
+        pull(correlacao)
+    
+    return(theta_c_correlacao)
+}
+
+booted_cor <- boot(data = dados, 
+               statistic = function_correlacao, 
+               R = 4000)
+
+cor = tidy(booted_cor, 
+          conf.level = .95,
+          conf.method = "basic",
+          conf.int = TRUE)
+cor
+```
+
+Estrelas X Commits
+
+```{r}
+
+function_correlacao = function(df, i){
+    theta_c_correlacao = df %>%
+        slice(i) %>%
+        summarise(correlacao = cor(stargazers_count, commits, method = "spearm")) %>%
+        pull(correlacao)
+    
+    return(theta_c_correlacao)
+}
+
+booted_cor <- boot(data = dados, 
+               statistic = function_correlacao, 
+               R = 4000)
+
+cor = tidy(booted_cor, 
+          conf.level = .95,
+          conf.method = "basic",
+          conf.int = TRUE)
+cor
+
+```
+
+Estrelas X Contributors
+
+```{r}
+
+function_correlacao = function(df, i){
+    theta_c_correlacao = df %>%
+        slice(i) %>%
+        summarise(correlacao = cor(stargazers_count, contributors, method = "spearm")) %>%
+        pull(correlacao)
+    
+    return(theta_c_correlacao)
+}
+
+booted_cor <- boot(data = dados, 
+               statistic = function_correlacao, 
+               R = 4000)
+
+cor = tidy(booted_cor, 
+          conf.level = .95,
+          conf.method = "basic",
+          conf.int = TRUE)
+cor
+
+```
+
+Estrelas X Forks
+
+```{r}
+
 function_correlacao = function(df, i){
     theta_c_correlacao = df %>%
         slice(i) %>%
@@ -344,27 +418,17 @@ function_correlacao = function(df, i){
     return(theta_c_correlacao)
 }
 
-theta_c_correlacao = function_correlacao(dados, 1:NROW(dados))
-theta_c_correlacao
-```
-
-
-```{r}
-library(boot)
-library(broom)
-
-
 booted_cor <- boot(data = dados, 
                statistic = function_correlacao, 
                R = 4000)
 
-ci_cor = tidy(booted_cor, 
+cor = tidy(booted_cor, 
           conf.level = .95,
           conf.method = "basic",
           conf.int = TRUE)
-ci_cor
-```
+cor
 
+```
 
 todo: 
 - intervalos de confiança
